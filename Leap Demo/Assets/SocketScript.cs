@@ -25,6 +25,8 @@ namespace Assets
         public string database_info;
         public int handid;
         public bool showfakehand;
+        public bool fakehandchange = false;
+        public Hand test;
         //初始化  
         public void InitSocket()
         {
@@ -57,7 +59,8 @@ namespace Assets
             //获取客户端的IP和端口  
             IPEndPoint ipEndClient = (IPEndPoint)clientSocket.RemoteEndPoint;
             //输出客户端的IP和端口  
-            Console.WriteLine("Connect with " + ipEndClient.Address.ToString() + ":" + ipEndClient.Port.ToString());
+            //Console.WriteLine("Connect with " + ipEndClient.Address.ToString() + ":" + ipEndClient.Port.ToString());
+            UnityEngine.Debug.Log("Connect with " + ipEndClient.Address.ToString() + ":" + ipEndClient.Port.ToString());
             //连接成功则发送数据  
             sendStr = "Welcome to my server";
             SocketSend(sendStr);
@@ -81,6 +84,7 @@ namespace Assets
             //进入接收循环  
             while (true)
             {
+                
                 //对data清零  
                 recvData = new byte[1024];
                 //获取收到的数据的长度  
@@ -101,22 +105,35 @@ namespace Assets
                 }
                 //输出接收到的数据  
                 recvStr = Encoding.ASCII.GetString(recvData, 0, recvLen);
+                UnityEngine.Debug.Log(recvStr);
+                string[] recv_buffer = recvStr.Split("|".ToCharArray());
+                //recvStr = ReceiveData();
                 //打印
                 //Console.WriteLine(recvStr);
-                mode = Int32.Parse(recvStr);
+                mode = Int32.Parse(recv_buffer[0]);
                 //根据显示模式处理数据
                 switch(mode)
                 {
                     case 0:
+                        /*
                         recvData = new byte[1000];
                         recvLen = clientSocket.Receive(recvData);
                         database_info = Encoding.ASCII.GetString(recvData, 0, recvLen);
+                        */
+                        //database_info = ReceiveData();
+                        database_info = recv_buffer[1];
+                        showfakehand = false;
                         break;
                     case 1:
+                        /*
                         recvData = new byte[1000];
                         recvLen = clientSocket.Receive(recvData);
                         handid = Int32.Parse(Encoding.ASCII.GetString(recvData, 0, recvLen));
+                        */
+                        //handid = Int32.Parse(ReceiveData());
+                        handid = Int32.Parse(recv_buffer[1]);
                         showfakehand = true;
+                        fakehandchange = true;
                         break;
                     case 2:
                         showfakehand = false;
@@ -132,7 +149,27 @@ namespace Assets
                 SocketSend(sendStr);
             }
         }
-
+        public string  ReceiveData()
+        {
+            string answer="";
+            do
+            {
+                recvData = new byte[1024];
+                //获取收到的数据的长度  
+                try
+                {
+                    recvLen = clientSocket.Receive(recvData);
+                }
+                catch
+                {
+                    Console.WriteLine(clientSocket.RemoteEndPoint.ToString() + " Offline");
+                    SocketConnect();
+                }
+            } while (recvLen == 0);
+            answer = Encoding.ASCII.GetString(recvData,0,recvLen);
+            UnityEngine.Debug.Log(answer);
+            return answer;
+        }
         //连接关闭  
         public void SocketQuit()
         {

@@ -283,8 +283,8 @@
     <Reference Include="LeapCSharp.NET3.5">
       <HintPath>Assets\LeapMotion\Core\Plugins\LeapCSharp.NET3.5.dll</HintPath>
     </Reference>
-    <Reference Include="mysql.data">
-      <HintPath>Assets\LeapMotion\Core\Plugins\mysql.data.dll</HintPath>
+    <Reference Include="Mysql.Data">
+      <HintPath>Assets\LeapMotion\Core\Plugins\Mysql.Data.dll</HintPath>
     </Reference>
     <Reference Include="System.Data">
       <HintPath>Assets\LeapMotion\Core\Plugins\System.Data.dll</HintPath>

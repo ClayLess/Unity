@@ -24,7 +24,7 @@ namespace Leap.Unity {
   public class LeapServiceProvider : LeapProvider {
         //add a tcpsever socket
         SocketServer tcpserver = new SocketServer();
-        Hand fakehand;
+      protected  Hand fakehand = new Hand();
         /** Conversion factor for nanoseconds to seconds. */
         protected const float NS_TO_S = 1e-6f;
     /** Conversion factor for seconds to nanoseconds. */
@@ -175,6 +175,8 @@ namespace Leap.Unity {
             //add tcpserver
            
             tcpserver.InitSocket();
+            tcpserver.mode = 2;
+            fakehand = AddHand.getHand();
     }
 
     protected virtual void Update() {
@@ -207,23 +209,28 @@ namespace Leap.Unity {
             /*
              * 
              */
-            if (tcpserver.mode > -1)
+            if (tcpserver.showfakehand)
             {
-                print(tcpserver.mode);
-                if(tcpserver.mode==1)
+                if (tcpserver.fakehandchange)
                 {
-                    fakehand = Assets.AddHand.getHand(tcpserver.handid,tcpserver.database_info);
-                    //Assets.AddHand.ToFrame(ref _untransformedUpdateFrame, fakehand); //添加假手到当前帧
+                    UnityEngine.Debug.Log("Change");
+                    fakehand = AddHand.getHand(tcpserver.handid, tcpserver.database_info);
+                    
+                    tcpserver.fakehandchange = false;
                 }
-
-                //if (tcpserver.show_mode == 2) { }
-                
-                //Assets.AddHand.ToFrame(ref _untransformedUpdateFrame,fakehand);
-                print(_untransformedUpdateFrame.Id + "  " + fakehand.Id);
+                //UnityEngine.Debug.Log(fakehand.TimeVisible);
+                AddHand.ToFrame(ref _untransformedUpdateFrame, fakehand);
             }
-            //AddHand(ref _untransformedUpdateFrame, getHand());
-      //end
-      imageTimeStamp = leap_controller_.FrameTimestamp();
+            //
+            /*
+            if (_untransformedUpdateFrame.Hands.Count > 0)
+            {
+                UnityEngine.Debug.Log(fakehand.Id + " " + fakehand.TimeVisible);
+                UnityEngine.Debug.Log(AddHand.ToFrame(ref _untransformedUpdateFrame, fakehand));
+            }
+            */
+            //end
+            imageTimeStamp = leap_controller_.FrameTimestamp();
 
       if (_untransformedUpdateFrame != null) {
         transformFrame(_untransformedUpdateFrame, _transformedUpdateFrame);
